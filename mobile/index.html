@@ -30,7 +30,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
   </div>
   <div style="display:flex;align-items:flex-start;gap:14px">
   <div style="flex:none;width:{{fitW}}px;height:{{fitH}}px">
-  <div style="position:relative;background:{{devBezel}};border-radius:{{devOuterR}};padding:{{devPad}};box-shadow:0 24px 60px rgba(33,48,78,.32),0 6px 16px rgba(0,0,0,.24);transform:scale({{fit}});transform-origin:top left">
+  <div style="position:relative;width:{{devBoxW}}px;height:{{devBoxH}}px;background:{{devBezel}};border-radius:{{devOuterR}};padding:{{devPad}};overflow:hidden;box-shadow:0 24px 60px rgba(33,48,78,.32),0 6px 16px rgba(0,0,0,.24);transform:scale({{fit}});transform-origin:top left">
     <div style="position:relative;width:{{devW}};height:{{devH}};background:#f6f0e2;border-radius:{{devInnerR}};overflow:hidden;display:flex;flex-direction:column">
       <div aria-hidden="true" style="position:absolute;top:0;left:0;right:0;height:{{islandZone}};z-index:6;display:flex;align-items:center;justify-content:center;pointer-events:none">
         <span style="width:{{camW}};height:{{camH}};border-radius:999px;background:#0b0c0f"></span>
@@ -1471,7 +1471,7 @@ class Component extends DCLogic {
     const v={};
     const d=this.DEVS[s.device]||this.DEVS.ios;
     const nat={w:parseInt(d.w)+2*parseInt(d.pad),h:parseInt(d.h)+2*parseInt(d.pad)};
-    v.fit=s.fit||1; v.fitW=Math.round(nat.w*v.fit); v.fitH=Math.round(nat.h*v.fit);
+    v.fit=s.fit||1; v.fitW=Math.round(nat.w*v.fit); v.fitH=Math.round(nat.h*v.fit); v.devBoxW=nat.w; v.devBoxH=nat.h;
     v.devBezel=d.bezel; v.devOuterR=d.outerR; v.devPad=d.pad; v.devW=d.w; v.devH=d.h; v.devInnerR=d.innerR; v.contentMax=d.contentMax;
     v.statusH=d.statusH; v.statusFs=d.statusFs; v.statusPad=d.statusPad; v.islandZone=d.islandZone; v.camW=d.camW; v.camH=d.camH; v.statusTime='9:41';
     v.devices=[['ios','iPhone'],['android','Android'],['tablet','Tablet']].map(x=>({label:x[1],on:()=>this.setState({device:x[0]},()=>this.fit()),on2:s.device===x[0],bg:s.device===x[0]?'#21304e':'transparent',fg:s.device===x[0]?'#f7f1e3':'#21304e'}));
