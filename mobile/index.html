@@ -22,6 +22,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
 [data-jc-scroll]::-webkit-scrollbar{width:0;height:0;display:none}
 </style>
 </helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#7d2434"/><g transform="translate(50 52)" fill="#f6f0e2"><circle cx="0" cy="-16" r="7"/><path d="M-13 20 C-13 2 -7 -6 0 -6 C7 -6 13 2 13 20 Z"/><rect x="-16" y="20" width="32" height="6" rx="2"/></g><text x="50" y="88" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#f6f0e2">JuChess</text></svg></template>
 <div style="min-height:100dvh;background:#d7cfbd;display:flex;flex-direction:column;align-items:center;padding:14px 12px 26px;font-family:-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif;color:#21304e">
   <div ref="{{switcherRef}}" role="group" aria-label="Device preview" style="display:flex;gap:5px;margin-bottom:14px;background:#fbf7ec;border:1px solid rgba(33,48,78,.18);border-radius:999px;padding:4px;box-shadow:0 1px 3px rgba(33,48,78,.12)">
     <sc-for list="{{devices}}" as="dv" hint-placeholder-count="3">
@@ -68,6 +69,12 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
         <div style="font-size:12px;color:rgba(33,48,78,.6);margin-top:2px">Sign in to register and save analyses</div>
       </div>
       <button onClick="{{goSignin}}" style="flex:none;padding:10px 16px;border:none;border-radius:10px;background:#7d2434;color:#f7f1e3;font-size:13px;font-weight:600">Sign in</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{isMember}}" hint-placeholder-val="{{false}}">
+    <div style="margin:14px 16px 0;padding:13px 16px;background:rgba(169,138,63,.13);border:1px solid rgba(169,138,63,.42);border-radius:14px">
+      <div style="font-family:'Source Serif 4',Georgia,serif;font-size:16.5px;font-weight:700;line-height:1.2;color:#6d5623">Welcome back, {{userFirst}}</div>
+      <div style="font-size:12px;color:rgba(33,48,78,.6);margin-top:3px">Club rank {{pRank}} · Rating {{pRating}}</div>
     </div>
   </sc-if>
 
@@ -416,18 +423,32 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
           <div style="font-size:15px;font-weight:700;color:#21304e">{{tdWinner}}</div></div>
         </div>
       </sc-if>
-      <div style="background:#fdfaf1;border:1px solid rgba(33,48,78,.16);border-radius:14px;overflow:hidden">
-        <sc-for list="{{tdFacts}}" as="f" hint-placeholder-count="7">
-          <div style="display:flex;justify-content:space-between;gap:14px;padding:11px 14px;border-bottom:1px solid rgba(33,48,78,.08)">
-            <span style="font-size:12.5px;color:rgba(33,48,78,.6);flex:none">{{f.k}}</span>
-            <span style="font-size:13px;font-weight:600;text-align:right;min-width:0;overflow-wrap:break-word">{{f.x}}</span>
+      <sc-if value="{{tdShowFacts}}" hint-placeholder-val="{{false}}">
+        <div style="background:#fdfaf1;border:1px solid rgba(33,48,78,.16);border-radius:14px;overflow:hidden">
+          <sc-for list="{{tdFacts}}" as="f" hint-placeholder-count="7">
+            <div style="display:flex;justify-content:space-between;gap:14px;padding:11px 14px;border-bottom:1px solid rgba(33,48,78,.08)">
+              <span style="font-size:12.5px;color:rgba(33,48,78,.6);flex:none">{{f.k}}</span>
+              <span style="font-size:13px;font-weight:600;text-align:right;min-width:0;overflow-wrap:break-word">{{f.x}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{tdRegistered}}" hint-placeholder-val="{{false}}">
+        <div style="background:#fdfaf1;border:1px solid rgba(169,138,63,.4);border-radius:16px;padding:18px 16px;text-align:center">
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:999px;background:rgba(31,138,91,.12);border:1px solid rgba(31,138,91,.4);font-size:11px;font-weight:700;color:#1f8a5b"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>You're registered</div>
+          <div style="font-size:12.5px;color:rgba(33,48,78,.6);margin-top:8px;line-height:1.4">Show this at check-in — it stays here anytime.</div>
+          <img src="{{tdQrSrc}}" alt="Registration QR code" style="width:168px;height:168px;margin:14px auto 0;display:block;border:1px solid rgba(33,48,78,.14);border-radius:12px;padding:8px;background:#fffdf6">
+          <div style="margin-top:14px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(33,48,78,.5)">Check-in code</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:27px;font-weight:700;letter-spacing:.16em;color:#21304e">{{tdRegCodeSpaced}}</span>
+            <button onClick="{{tdCopyCode}}" aria-label="Copy check-in code" style="flex:none;width:40px;height:40px;border-radius:10px;border:1px solid rgba(33,48,78,.2);background:#fffdf6;color:#7d2434;display:flex;align-items:center;justify-content:center" style-active="background:#f4ecd9"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg></button>
           </div>
-        </sc-for>
-      </div>
+        </div>
+      </sc-if>
       <sc-if value="{{tdGuestWarn}}" hint-placeholder-val="{{false}}">
         <div style="margin-top:12px;padding:11px 14px;background:rgba(125,36,52,.06);border:1px solid rgba(125,36,52,.25);border-radius:12px;font-size:12.5px;color:#7d2434;font-weight:600">Registration requires a club player account.</div>
       </sc-if>
-      <button onClick="{{tdCtaOn}}" style="width:100%;margin-top:14px;padding:14px;border:none;border-radius:12px;background:#7d2434;color:#f7f1e3;font-size:14.5px;font-weight:600" style-active="transform:scale(.985)">{{tdCtaLabel}}</button>
+      <button onClick="{{tdCtaOn}}" style="width:100%;margin-top:14px;padding:14px;border:{{tdCtaBd}};border-radius:12px;background:{{tdCtaBg}};color:{{tdCtaFg}};font-size:14.5px;font-weight:600" style-active="transform:scale(.985)">{{tdCtaLabel}}</button>
     </div>
   </sc-if>
 
@@ -785,12 +806,6 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
     <h1 style="margin:0;flex:1;font-family:'Source Serif 4',Georgia,serif;font-size:19px;font-weight:700">Tools</h1>
   </div>
   <div style="display:flex;flex-direction:column;gap:12px;padding:16px 16px 0">
-    <button onClick="{{goBoardStart}}" style="width:100%;display:flex;align-items:center;gap:14px;padding:17px 16px;background:#fdfaf1;border:1px solid rgba(33,48,78,.16);border-radius:14px;text-align:left" style-active="background:#f4ecd9">
-      <span aria-hidden="true" style="flex:none;width:44px;height:44px;border-radius:11px;background:rgba(125,36,52,.08);border:1px solid rgba(125,36,52,.2);display:flex;align-items:center;justify-content:center;font-size:21px;color:#7d2434">♟</span>
-      <span style="flex:1"><span style="display:block;font-size:15px;font-weight:700;color:#21304e">Analysis Board</span>
-      <span style="display:block;font-size:12px;color:rgba(33,48,78,.6);margin-top:2px">Move pieces freely and record lines</span></span>
-      <span aria-hidden="true" style="font-size:17px;color:rgba(33,48,78,.4)">›</span>
-    </button>
     <button onClick="{{goClock}}" style="width:100%;display:flex;align-items:center;gap:14px;padding:17px 16px;background:#fdfaf1;border:1px solid rgba(33,48,78,.16);border-radius:14px;text-align:left" style-active="background:#f4ecd9">
       <span aria-hidden="true" style="flex:none;width:44px;height:44px;border-radius:11px;background:rgba(125,36,52,.08);border:1px solid rgba(125,36,52,.2);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;font-weight:700;color:#7d2434">5:00</span>
       <span style="flex:1"><span style="display:block;font-size:15px;font-weight:700;color:#21304e">Chess Clock</span>
@@ -814,9 +829,17 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
     <h1 style="margin:0;flex:1;font-family:'Source Serif 4',Georgia,serif;font-size:18px;font-weight:700">Analysis Board</h1>
   </div>
   <div style="padding:14px 16px 0">
-    <div style="display:grid;grid-template-columns:repeat(8,1fr);border:2px solid #21304e;border-radius:8px;overflow:hidden;aspect-ratio:1" role="grid" aria-label="Chessboard">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span aria-hidden="true" style="width:14px;height:14px;border-radius:50%;background:{{bStatusDot}};border:1px solid rgba(33,48,78,.35);flex:none"></span>
+      <span aria-live="polite" style="font-size:13.5px;font-weight:700;color:{{bStatusColor}}">{{bStatus}}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(8,1fr);border:2px solid #21304e;border-radius:8px;overflow:hidden;aspect-ratio:1;box-shadow:0 4px 14px rgba(33,48,78,.18)" role="grid" aria-label="Chessboard">
       <sc-for list="{{sq}}" as="c" hint-placeholder-count="64">
-        <button onClick="{{c.tap}}" role="gridcell" style="aspect-ratio:1;border:none;padding:0;background:{{c.bg}};display:flex;align-items:center;justify-content:center;font-size:clamp(22px,7.6vw,34px);line-height:1;color:{{c.col}};text-shadow:{{c.sh}}">{{c.ch}}</button>
+        <button onClick="{{c.tap}}" role="gridcell" style="position:relative;aspect-ratio:1;border:none;padding:0;background:{{c.bg}};display:flex;align-items:center;justify-content:center;font-size:clamp(22px,7.6vw,35px);line-height:1;color:{{c.col}};text-shadow:{{c.sh}}">
+          <sc-if value="{{c.dot}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="position:absolute;width:28%;height:28%;border-radius:50%;background:rgba(33,48,78,.34)"></span></sc-if>
+          <sc-if value="{{c.ring}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="position:absolute;inset:7%;border:3px solid rgba(125,36,52,.5);border-radius:50%"></span></sc-if>
+          <span style="position:relative;z-index:1">{{c.ch}}</span>
+        </button>
       </sc-for>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px">
@@ -830,7 +853,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #7d24
         <div style="font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.8;color:#21304e;overflow-wrap:break-word">{{movesText}}</div>
       </sc-if>
       <sc-if value="{{noMoves}}" hint-placeholder-val="{{true}}">
-        <div style="font-size:12.5px;color:rgba(33,48,78,.5)">Tap a piece, then a square, to record a line.</div>
+        <div style="font-size:12.5px;color:rgba(33,48,78,.5)">Tap a piece to see its legal moves, then tap a highlighted square.</div>
       </sc-if>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px">
@@ -1220,7 +1243,8 @@ class Component extends DCLogic {
     tTab:'active',dTab:'overview',brSeg:'w',stageSel:1,brFocus:0,device:'ios',otpMethod:'email',suStr:0,rpStr:0,fit:1,sbVis:0,sbFrac:0,
     pwa:false,pwb:false,pwc:false,pwd:false,pwe:false,
     cells:this.startPos(),sel:-1,flip:false,hist:[],moves:[],
-    saved:[],
+    bTurn:'w',bcastle:{wK:true,wQ:true,bK:true,bQ:true},bep:-1,legal:[],bLast:null,bGameOver:null,bCheckIdx:-1,
+    saved:[],reg:{},
     preset:'10+0',wT:600,bT:600,inc:0,running:false,turn:'w',flag:null,
     toast:null,now:Date.now()
   };
@@ -1270,8 +1294,104 @@ class Component extends DCLogic {
   openBoard(mode){
     const cells=mode==='empty'?Array(64).fill(null):this.startPos();
     this.go('board');
-    this.setState({cells,moves:[],hist:[],sel:-1,flip:false});
-    if(mode==='mock') this.notify('Mock game loaded — no engine connected');
+    this.setState({cells,moves:[],hist:[],sel:-1,flip:false,bTurn:'w',bcastle:{wK:true,wQ:true,bK:true,bQ:true},bep:-1,legal:[],bLast:null,bGameOver:null,bCheckIdx:-1});
+    if(mode==='mock') this.notify('Board ready — play out any line (mock, no engine)');
+  }
+  inb(r,c){ return r>=0&&r<8&&c>=0&&c<8; }
+  ix(r,c){ return r*8+c; }
+  rc(i){ return [Math.floor(i/8), i%8]; }
+  pseudo(cells,i,st){
+    const p=cells[i]; if(!p) return [];
+    const col=p[0],type=p[1],[r,c]=this.rc(i),out=[];
+    if(type==='p'){
+      const dir=col==='w'?-1:1, sr=col==='w'?6:1;
+      if(this.inb(r+dir,c)&&!cells[this.ix(r+dir,c)]){ out.push(this.ix(r+dir,c)); if(r===sr&&!cells[this.ix(r+2*dir,c)]) out.push(this.ix(r+2*dir,c)); }
+      for(const dc of [-1,1]){ const rr=r+dir,cc=c+dc; if(!this.inb(rr,cc))continue; const ti=this.ix(rr,cc); if(cells[ti]&&cells[ti][0]!==col) out.push(ti); else if(ti===st.ep) out.push(ti); }
+    } else if(type==='n'){
+      for(const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){ const rr=r+dr,cc=c+dc; if(this.inb(rr,cc)){const t=cells[this.ix(rr,cc)]; if(!t||t[0]!==col)out.push(this.ix(rr,cc));} }
+    } else if(type==='k'){
+      for(const dr of [-1,0,1])for(const dc of [-1,0,1]){ if(!dr&&!dc)continue; const rr=r+dr,cc=c+dc; if(this.inb(rr,cc)){const t=cells[this.ix(rr,cc)]; if(!t||t[0]!==col)out.push(this.ix(rr,cc));} }
+    } else {
+      const dirs=type==='b'?[[-1,-1],[-1,1],[1,-1],[1,1]]:type==='r'?[[-1,0],[1,0],[0,-1],[0,1]]:[[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]];
+      for(const [dr,dc] of dirs){ let rr=r+dr,cc=c+dc; while(this.inb(rr,cc)){ const ti=this.ix(rr,cc); if(!cells[ti]){out.push(ti);} else { if(cells[ti][0]!==col)out.push(ti); break; } rr+=dr;cc+=dc; } }
+    }
+    return out;
+  }
+  attacked(cells,i,by){
+    const [r,c]=this.rc(i), pd=by==='w'?1:-1;
+    for(const dc of [-1,1]){ const rr=r+pd,cc=c+dc; if(this.inb(rr,cc)&&cells[this.ix(rr,cc)]===by+'p')return true; }
+    for(const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){ const rr=r+dr,cc=c+dc; if(this.inb(rr,cc)&&cells[this.ix(rr,cc)]===by+'n')return true; }
+    for(const dr of [-1,0,1])for(const dc of [-1,0,1]){ if(!dr&&!dc)continue; const rr=r+dr,cc=c+dc; if(this.inb(rr,cc)&&cells[this.ix(rr,cc)]===by+'k')return true; }
+    for(const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]){ let rr=r+dr,cc=c+dc; while(this.inb(rr,cc)){ const p=cells[this.ix(rr,cc)]; if(p){ if(p[0]===by&&(p[1]==='b'||p[1]==='q'))return true; break; } rr+=dr;cc+=dc; } }
+    for(const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]){ let rr=r+dr,cc=c+dc; while(this.inb(rr,cc)){ const p=cells[this.ix(rr,cc)]; if(p){ if(p[0]===by&&(p[1]==='r'||p[1]==='q'))return true; break; } rr+=dr;cc+=dc; } }
+    return false;
+  }
+  kingIx(cells,col){ return cells.indexOf(col+'k'); }
+  applyMove(cells,from,to,st){
+    const nc=[...cells],p=nc[from],col=p[0],type=p[1];
+    const [fr,fc]=this.rc(from),[tr,tc]=this.rc(to);
+    let ep=-1,capture=!!nc[to],castleSide=null,promo=false; const castle={...st.castle};
+    if(type==='p'&&to===st.ep&&!nc[to]){ nc[this.ix(fr,tc)]=null; capture=true; }
+    nc[to]=p; nc[from]=null;
+    if(type==='p'&&Math.abs(tr-fr)===2) ep=this.ix((fr+tr)/2,fc);
+    if(type==='p'&&(tr===0||tr===7)){ nc[to]=col+'q'; promo=true; }
+    if(type==='k'&&Math.abs(tc-fc)===2){
+      if(tc===6){ const rk=this.ix(fr,7); nc[this.ix(fr,5)]=nc[rk]; nc[rk]=null; castleSide='K'; }
+      else { const rk=this.ix(fr,0); nc[this.ix(fr,3)]=nc[rk]; nc[rk]=null; castleSide='Q'; }
+    }
+    if(type==='k'){ if(col==='w'){castle.wK=false;castle.wQ=false;} else {castle.bK=false;castle.bQ=false;} }
+    if(from===this.ix(7,0)||to===this.ix(7,0)) castle.wQ=false;
+    if(from===this.ix(7,7)||to===this.ix(7,7)) castle.wK=false;
+    if(from===this.ix(0,0)||to===this.ix(0,0)) castle.bQ=false;
+    if(from===this.ix(0,7)||to===this.ix(0,7)) castle.bK=false;
+    return {cells:nc,ep,castle,capture,castleSide,promo};
+  }
+  legalMoves(cells,from,st){
+    const p=cells[from]; if(!p) return [];
+    const col=p[0],opp=col==='w'?'b':'w';
+    let moves=this.pseudo(cells,from,st);
+    if(p[1]==='k'){
+      const [r,c]=this.rc(from),home=col==='w'?7:0;
+      if(r===home&&c===4&&!this.attacked(cells,from,opp)){
+        const kS=col==='w'?st.castle.wK:st.castle.bK, qS=col==='w'?st.castle.wQ:st.castle.bQ;
+        if(kS&&!cells[this.ix(home,5)]&&!cells[this.ix(home,6)]&&!this.attacked(cells,this.ix(home,5),opp)&&!this.attacked(cells,this.ix(home,6),opp)) moves.push(this.ix(home,6));
+        if(qS&&!cells[this.ix(home,1)]&&!cells[this.ix(home,2)]&&!cells[this.ix(home,3)]&&!this.attacked(cells,this.ix(home,3),opp)&&!this.attacked(cells,this.ix(home,2),opp)) moves.push(this.ix(home,2));
+      }
+    }
+    return moves.filter(to=>{ const r=this.applyMove(cells,from,to,st); const ki=this.kingIx(r.cells,col); return ki>=0&&!this.attacked(r.cells,ki,opp); });
+  }
+  anyLegal(cells,col,st){
+    for(let i=0;i<64;i++){ if(cells[i]&&cells[i][0]===col&&this.legalMoves(cells,i,st).length) return true; }
+    return false;
+  }
+  san(from,to,piece,r,suffix){
+    const files='abcdefgh',[fr,fc]=this.rc(from),[tr,tc]=this.rc(to),dest=files[tc]+(8-tr),type=piece[1];
+    if(r.castleSide==='K') return 'O-O'+suffix;
+    if(r.castleSide==='Q') return 'O-O-O'+suffix;
+    if(type==='p'){ let x=r.capture?files[fc]+'x'+dest:dest; if(r.promo)x+='=Q'; return x+suffix; }
+    return {n:'N',b:'B',r:'R',q:'Q',k:'K'}[type]+(r.capture?'x':'')+dest+suffix;
+  }
+  bTap(i){
+    const s=this.state; if(s.bGameOver) return;
+    const st={ep:s.bep,castle:s.bcastle}, p=s.cells[i];
+    if(s.sel<0){ if(p&&p[0]===s.bTurn) this.setState({sel:i,legal:this.legalMoves(s.cells,i,st)}); return; }
+    if(i===s.sel){ this.setState({sel:-1,legal:[]}); return; }
+    if(p&&p[0]===s.bTurn){ this.setState({sel:i,legal:this.legalMoves(s.cells,i,st)}); return; }
+    if(s.legal.includes(i)) this.doMove(s.sel,i);
+    else this.setState({sel:-1,legal:[]});
+  }
+  doMove(from,to){
+    const s=this.state,st={ep:s.bep,castle:s.bcastle},piece=s.cells[from];
+    const r=this.applyMove(s.cells,from,to,st),mover=s.bTurn,opp=mover==='w'?'b':'w';
+    const oppKing=this.kingIx(r.cells,opp),inChk=oppKing>=0&&this.attacked(r.cells,oppKing,mover);
+    const oppMoves=this.anyLegal(r.cells,opp,{ep:r.ep,castle:r.castle});
+    let over=null,suffix='';
+    if(inChk&&!oppMoves){ over={type:'checkmate',winner:mover}; suffix='#'; }
+    else if(!inChk&&!oppMoves){ over={type:'stalemate'}; }
+    else if(inChk) suffix='+';
+    const snap={cells:s.cells,bTurn:s.bTurn,bcastle:s.bcastle,bep:s.bep,bLast:s.bLast,moves:s.moves,bGameOver:s.bGameOver,bCheckIdx:s.bCheckIdx};
+    this.setState({ cells:r.cells,bTurn:opp,bcastle:r.castle,bep:r.ep,sel:-1,legal:[],bLast:{from,to},
+      hist:[...s.hist,snap],moves:[...s.moves,this.san(from,to,piece,r,suffix)],bGameOver:over,bCheckIdx:inChk?oppKing:-1 });
   }
   signInMock(){
     this.setState({user:{name:'Ibrahim Ahmad',cc:'ibrahim_ju',rating:1810,rank:1},route:{name:'home',params:{}},stack:[]});
@@ -1297,6 +1417,29 @@ class Component extends DCLogic {
     }
   }
   fmtT(t){ const m=Math.floor(t/60),x=Math.floor(t%60); return m+':'+(x<10?'0':'')+x; }
+  qrMatrix(seed){
+    const N=21, m=Array.from({length:N},()=>Array(N).fill(0));
+    const place=(r,c)=>{ for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){const rr=r+i,cc=c+j; if(rr<0||cc<0||rr>=N||cc>=N)continue; const b=(i===0||i===6||j===0||j===6),n=(i>=2&&i<=4&&j>=2&&j<=4); m[rr][cc]=(b||n)?1:0;} };
+    place(0,0); place(0,N-7); place(N-7,0);
+    for(let i=8;i<N-8;i++){ m[6][i]=i%2===0?1:0; m[i][6]=i%2===0?1:0; }
+    let s=0; for(const ch of String(seed)) s=(Math.imul(s,31)+ch.charCodeAt(0))>>>0; s=(s^0x9e3779b9)>>>0;
+    const rsv=(r,c)=>((r<8&&c<8)||(r<8&&c>=N-8)||(r>=N-8&&c<8)||r===6||c===6);
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){ if(rsv(r,c))continue; s=(Math.imul(s,1664525)+1013904223)>>>0; m[r][c]=(s>>>15)&1; }
+    return m;
+  }
+  qrDataUri(code){
+    const m=this.qrMatrix(code),N=m.length,cell=4,pad=2,size=(N+pad*2)*cell; let rects='';
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++) if(m[r][c]) rects+="<rect x='"+((c+pad)*cell)+"' y='"+((r+pad)*cell)+"' width='"+cell+"' height='"+cell+"'/>";
+    const svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 "+size+" "+size+"'><rect width='"+size+"' height='"+size+"' fill='#fffdf6'/><g fill='#21304e'>"+rects+"</g></svg>";
+    return 'data:image/svg+xml,'+encodeURIComponent(svg);
+  }
+  toggleReg(t){
+    if(!this.user()){ this.go('signin'); return; }
+    const reg={...this.state.reg};
+    if(reg[t.id]){ delete reg[t.id]; this.setState({reg}); this.notify('Registration cancelled'); }
+    else{ reg[t.id]={code:String(Math.floor(100000+Math.random()*900000))}; this.setState({reg}); this.notify('Registered — your check-in code is ready'); }
+  }
+  copyCode(code){ try{navigator.clipboard&&navigator.clipboard.writeText(code);}catch(e){} this.notify('Check-in code copied'); }
   fmtPts(p){ const f=Math.floor(p),h=p%1?'½':''; return (f===0&&h)?'½':f+h; }
   strength(v){ if(!v) return 0; let n=0; if(v.length>=8)n++; if(/[A-Za-z]/.test(v)&&/[0-9]/.test(v))n++; if(/[^A-Za-z0-9]/.test(v))n++; return n; }
   focusRound(i){ this.setState({brFocus:i}); const el=this.brScrollEl; if(el) requestAnimationFrame(()=>el.scrollTo({left:i*186,behavior:'smooth'})); }
@@ -1359,7 +1502,7 @@ class Component extends DCLogic {
     const hasLive=t.status==='active'&&live.length>0;
     const mainLab={swiss:'Standings',rr:'Standings',drr:'Standings',league:'Standings',ko:'Bracket',de:'Bracket',arena:'Leaderboard',team:'Teams',multi:'Stages'}[t.fk];
     const roundsLab={ko:'Matches',de:'Matches',team:'Matches',arena:'Games'}[t.fk]||'Rounds';
-    const tabs=[{key:'overview',label:'Overview'}];
+    const tabs=[{key:'overview',label:t.status==='completed'?'Overview':'Registration'}];
     if(hasLive) tabs.push({key:'live',label:'Live'});
     tabs.push({key:'main',label:mainLab},{key:'rounds',label:roundsLab},{key:'players',label:'Players'});
     let cur=s.dTab;
@@ -1374,17 +1517,26 @@ class Component extends DCLogic {
     let champ=null;
     if(t.status==='completed'){ champ = t.de? t.de.champ : this.stand(t.idxs,t.rounds)[0].i; }
     v.tdShowWinner=champ!=null; v.tdWinner=champ!=null?nm(champ):'';
-    v.tdGuestWarn=false;
-    if(t.status==='upcoming'){
-      if(t.reg==='Open'&&!user){ v.tdCtaLabel='Sign in to register'; v.tdCtaOn=()=>this.go('signin'); v.tdGuestWarn=true; }
-      else if(t.reg==='Open'){ v.tdCtaLabel='Register (mock)'; v.tdCtaOn=()=>this.notify('Registered — see you at Round 1 (mock)'); }
-      else { v.tdCtaLabel='View schedule'; v.tdCtaOn=()=>this.setState({dTab:'rounds'}); }
-    } else if(t.status==='active'){
-      v.tdCtaLabel=hasLive?'Watch live boards':'View '+mainLab.toLowerCase();
-      v.tdCtaOn=()=>this.setState({dTab:hasLive?'live':'main'});
+    v.tdShowFacts=t.status==='completed';
+    v.tdGuestWarn=false; v.tdRegistered=false;
+    const BD='1.5px solid rgba(125,36,52,.5)';
+    if(t.status==='completed'){
+      v.tdCtaLabel='View final '+mainLab.toLowerCase(); v.tdCtaOn=()=>this.setState({dTab:'main'});
+      v.tdCtaBg=BU; v.tdCtaFg=CREAM; v.tdCtaBd='none';
     } else {
-      v.tdCtaLabel='View final '+mainLab.toLowerCase();
-      v.tdCtaOn=()=>this.setState({dTab:'main'});
+      const entry=s.reg[t.id];
+      if(!user){
+        v.tdCtaLabel='Sign in to register'; v.tdCtaOn=()=>this.go('signin'); v.tdGuestWarn=true;
+        v.tdCtaBg=BU; v.tdCtaFg=CREAM; v.tdCtaBd='none';
+      } else if(entry){
+        v.tdRegistered=true; v.tdRegCode=entry.code; v.tdRegCodeSpaced=entry.code.split('').join(' '); v.tdQrSrc=this.qrDataUri(entry.code+'-'+t.id);
+        v.tdCopyCode=()=>this.copyCode(entry.code);
+        v.tdCtaLabel='Cancel registration'; v.tdCtaOn=()=>this.toggleReg(t);
+        v.tdCtaBg='transparent'; v.tdCtaFg=BU; v.tdCtaBd=BD;
+      } else {
+        v.tdCtaLabel='Register'; v.tdCtaOn=()=>this.toggleReg(t);
+        v.tdCtaBg=BU; v.tdCtaFg=CREAM; v.tdCtaBd='none';
+      }
     }
 
     v.tdShowStand=false; v.tdShowBracket=false; v.tdShowArena=false; v.tdShowTeam=false; v.tdShowSeg=false; v.tdShowStages=false; v.tdStandEmpty=false; v.tdShowRoundCard=false;
@@ -1534,17 +1686,30 @@ class Component extends DCLogic {
     const pk=[['Ibrahim Ahmad','Rania Odeh','1-0','Blitz 3+2 · Jun 29'],['Omar Saleh','Ibrahim Ahmad','½-½','Rapid 10+0 · Jun 27'],['Ibrahim Ahmad','Yazan Khaled','1-0','Blitz 5+0 · Jun 25'],['Leen Haddad','Ibrahim Ahmad','1-0','Rapid 15+10 · Jun 21']];
     v.pickRows=pk.map(g=>({t:g[0]+' vs '+g[1],res:g[2],sub:g[3],on:()=>this.openBoard('mock')}));
 
-    const cells=s.flip?[...s.cells].reverse():s.cells;
     const GL={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
-    v.sq=cells.map((pc,di)=>{
-      const i=s.flip?63-di:di; const row=Math.floor(di/8),col=di%8; const dark=(row+col)%2===1;
-      return {k:i,bg:s.sel===i?'#c9b06a':(dark?'#8d7250':'#e8dcbd'),ch:pc?GL[pc[1]]:'',col:pc?(pc[0]==='w'?'#fbf7ee':'#232a36'):'inherit',sh:pc&&pc[0]==='w'?'0 1px 2px rgba(0,0,0,.55)':'none',tap:()=>this.tap(i)};
+    const lastF=s.bLast?s.bLast.from:-1, lastT=s.bLast?s.bLast.to:-1, legalSet=new Set(s.legal||[]);
+    v.sq=Array.from({length:64},(_,di)=>{
+      const i=s.flip?63-di:di, pc=s.cells[i], row=Math.floor(di/8), col=di%8, dark=(row+col)%2===1;
+      let bg=dark?'#9a7b53':'#ecdcbb';
+      if(i===lastF||i===lastT) bg=dark?'#bfa657':'#e6cf87';
+      if(s.sel===i) bg=dark?'#caa74d':'#e7c96a';
+      if(i===s.bCheckIdx) bg='#d17b70';
+      return {k:i,bg,ch:pc?GL[pc[1]]:'',col:pc?(pc[0]==='w'?'#f8f1e0':'#1f252e'):'inherit',
+        sh:pc?(pc[0]==='w'?'0 1.5px 1px rgba(0,0,0,.45)':'0 1px 1px rgba(255,255,255,.12)'):'none',
+        dot:legalSet.has(i)&&!pc, ring:legalSet.has(i)&&!!pc, tap:()=>this.bTap(i)};
     });
     v.movesText=s.moves.length?s.moves.map((m,i)=>(i%2===0?((i/2)+1)+'. ':'')+m).join('  '):'';
     v.hasMoves=s.moves.length>0; v.noMoves=s.moves.length===0;
+    if(s.bGameOver){
+      v.bStatus = s.bGameOver.type==='checkmate' ? ('Checkmate — '+(s.bGameOver.winner==='w'?'White':'Black')+' wins') : 'Stalemate — draw';
+      v.bStatusColor='#7d2434'; v.bStatusDot=s.bGameOver.winner?'#7d2434':'#79622a';
+    } else {
+      v.bStatus=(s.bTurn==='w'?'White':'Black')+' to move'+(s.bCheckIdx>=0?' · Check':'');
+      v.bStatusColor=s.bCheckIdx>=0?'#7d2434':'rgba(33,48,78,.72)'; v.bStatusDot=s.bTurn==='w'?'#f4ecd6':'#2a3140';
+    }
     v.doFlip=()=>this.setState({flip:!s.flip});
-    v.doUndo=()=>{ if(!s.hist.length) return; const h=[...s.hist]; const prev=h.pop(); this.setState({cells:prev,hist:h,moves:s.moves.slice(0,-1),sel:-1}); };
-    v.doResetBoard=()=>this.setState({cells:this.startPos(),hist:[],moves:[],sel:-1});
+    v.doUndo=()=>{ if(!s.hist.length) return; const h=[...s.hist]; const snap=h.pop(); this.setState({cells:snap.cells,bTurn:snap.bTurn,bcastle:snap.bcastle,bep:snap.bep,bLast:snap.bLast,moves:snap.moves,bGameOver:snap.bGameOver,bCheckIdx:snap.bCheckIdx,hist:h,sel:-1,legal:[]}); };
+    v.doResetBoard=()=>this.setState({cells:this.startPos(),bTurn:'w',bcastle:{wK:true,wQ:true,bK:true,bQ:true},bep:-1,hist:[],moves:[],sel:-1,legal:[],bLast:null,bGameOver:null,bCheckIdx:-1});
     v.doSave=()=>{
       if(!user){ this.notify('Sign in to save analyses'); return; }
       this.setState({saved:[...s.saved,{t:'Analysis '+(s.saved.length+3),sub:s.moves.length+' moves · Today',on:()=>this.openBoard('mock')}]});
