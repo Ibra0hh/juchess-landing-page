@@ -16,7 +16,12 @@
   .ju-pulse { animation: ju-pulse 1.6s ease-in-out infinite; }
   @media (prefers-reduced-motion: reduce) { .ju-pulse { animation: none; } }
   @media (max-width: 960px) { .ju-nav-links { display: none !important; } }
-  @media (max-width: 760px) { .ju-t-meta { display: none !important; } }
+  .ju-tlist { display: flex; flex-direction: column; gap: 10px; }
+  .ju-tlist.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; align-items: stretch; }
+  .ju-tcard { grid-template-columns: auto 1fr auto; align-items: center; }
+  .ju-tlist.grid .ju-tcard { grid-template-columns: auto 1fr; align-items: start; align-content: start; }
+  .ju-tlist.grid .ju-t-meta { grid-column: 1 / -1; align-items: flex-start !important; text-align: left !important; border-top: 1px solid rgba(30,43,69,.1); padding-top: 10px; margin-top: 2px; }
+  @media (max-width: 760px) { .ju-tlist:not(.grid) .ju-t-meta { display: none; } }
 </style>
 </helmet>
 
@@ -54,17 +59,27 @@
       <input type="text" value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search tournaments, formats, venues…" style="width: 100%; height: 46px; padding: 0 16px 0 40px; border: 1px solid rgba(30,43,69,.24); border-radius: 10px; background: #FFFCF4; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: #1E2B45; outline: none; box-sizing: border-box; transition: border-color .15s ease;" style-focus="border-color: #7A2431; box-shadow: 0 0 0 3px rgba(122,36,49,.10);">
     </div>
 
-    <!-- centered filters -->
-    <div style="display: flex; justify-content: center; gap: 8px; margin-top: 18px;">
-      <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
-        <button type="button" onClick="{{ f.on }}" style="height: 36px; padding: 0 18px; border-radius: 999px; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; color: {{ f.col }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s ease;" style-hover="border-color: #7A2431;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">{{ f.label }}</button>
-      </sc-for>
+    <!-- filters + view toggle -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap;">
+      <div style="display: flex; gap: 8px; margin: 0 auto 0 0; flex-wrap: wrap; justify-content: center; flex: 1;">
+        <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+          <button type="button" onClick="{{ f.on }}" style="height: 36px; padding: 0 18px; border-radius: 999px; border: 1px solid {{ f.bd }}; background: {{ f.bg }}; color: {{ f.col }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s ease;" style-hover="border-color: #7A2431;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">{{ f.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display: inline-flex; background: rgba(30,43,69,.06); border: 1px solid rgba(30,43,69,.12); border-radius: 999px; padding: 3px; flex: none;">
+        <button type="button" onClick="{{ setListView }}" aria-label="List view" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border: none; border-radius: 999px; background: {{ listBtnBg }}; color: {{ listBtnCol }}; box-shadow: {{ listBtnSh }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 4h9M5 8h9M5 12h9"></path><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"></circle><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"></circle></svg>List
+        </button>
+        <button type="button" onClick="{{ setGridView }}" aria-label="Grid view" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border: none; border-radius: 999px; background: {{ gridBtnBg }}; color: {{ gridBtnCol }}; box-shadow: {{ gridBtnSh }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.4"></rect><rect x="9" y="1" width="6" height="6" rx="1.4"></rect><rect x="1" y="9" width="6" height="6" rx="1.4"></rect><rect x="9" y="9" width="6" height="6" rx="1.4"></rect></svg>Grid
+        </button>
+      </div>
     </div>
 
     <!-- list -->
-    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 30px; position: relative">
+    <div class="ju-tlist {{ viewClass }}" style="margin-top: 24px; position: relative">
       <sc-for list="{{ list }}" as="t" hint-placeholder-count="6">
-        <a href="{{ t.href }}" style="display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; text-decoration: none; color: #1E2B45; background: #FFFCF4; border: 1px solid rgba(30,43,69,.15); border-radius: 10px; padding: 14px 18px; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;" style-hover="border-color: #A98A3F; box-shadow: 0 5px 18px rgba(30,43,69,.10); transform: translateY(-1px);" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+        <a href="{{ t.href }}" class="ju-tcard" style="display: grid; gap: 16px; text-decoration: none; color: #1E2B45; background: #FFFCF4; border: 1px solid rgba(30,43,69,.15); border-radius: 10px; padding: 14px 18px; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;" style-hover="border-color: #A98A3F; box-shadow: 0 5px 18px rgba(30,43,69,.10); transform: translateY(-1px);" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
           <span style="width: 44px; height: 44px; flex: none; border-radius: 9px; background: {{ t.iconBg }}; border: 1px solid {{ t.iconBd }}; display: flex; align-items: center; justify-content: center;">
             <sc-if value="{{ t.isBlitz }}" hint-placeholder-val="{{ false }}">
               <svg viewBox="0 0 24 24" width="23" height="23" aria-label="Blitz"><path d="M13 2 4 13.5h6L9 22l10-12.5h-6z" fill="#F2C231" stroke="#C99A16" stroke-width="1" stroke-linejoin="round"></path></svg>
@@ -163,8 +178,18 @@ class Component extends DCLogic {
         bd: on ? '#7A2431' : 'rgba(30,43,69,.28)'
       };
     });
+    var isGrid = this.state.view === 'grid';
+    var active = { bg: '#7A2431', col: '#F8F3E7', sh: '0 1px 4px rgba(122,36,49,.3)' };
+    var idle = { bg: 'transparent', col: 'rgba(30,43,69,.6)', sh: 'none' };
+    var lb = isGrid ? idle : active, gb = isGrid ? active : idle;
+
     var _a = (window.JU && window.JU.auth) ? window.JU.auth.get() : null;
     return { query: this.state.query, setQuery: function (e) { self.setState({ query: e.target.value }); }, filters: filters, list: list, empty: list.length === 0 && !!window.JU,
+      viewClass: isGrid ? 'grid' : '',
+      setListView: function () { self.setState({ view: 'list' }); },
+      setGridView: function () { self.setState({ view: 'grid' }); },
+      listBtnBg: lb.bg, listBtnCol: lb.col, listBtnSh: lb.sh,
+      gridBtnBg: gb.bg, gridBtnCol: gb.col, gridBtnSh: gb.sh,
       signedIn: !!_a, signedOut: !_a, authName: _a ? _a.name : '', authInitials: _a ? window.JU.auth.initials(_a.name) : '' };
   }
   componentDidMount() {

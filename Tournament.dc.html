@@ -19,6 +19,13 @@
   .ju-bracket-scroll::-webkit-scrollbar { height: 8px; }
   .ju-bracket-scroll::-webkit-scrollbar-thumb { background: rgba(30,43,69,.25); border-radius: 4px; }
   @media (max-width: 960px) { .ju-nav-links { display: none !important; } }
+  .ju-gwrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 218px)); gap: 14px; }
+  .ju-gwrap.list { display: flex; flex-direction: column; gap: 8px; }
+  .ju-gwrap.list .ju-gcard { flex-direction: row !important; align-items: center; gap: 14px; padding: 9px 14px !important; }
+  .ju-gwrap.list .ju-gboard { width: 52px; height: 52px; flex: none; order: 0; }
+  .ju-gwrap.list .ju-gtop { order: 1; flex: 1; min-width: 0; justify-content: flex-start !important; gap: 8px; }
+  .ju-gwrap.list .ju-gbot { order: 2; flex: 1; min-width: 0; justify-content: flex-start !important; gap: 8px; }
+  .ju-gwrap.list .ju-gact { order: 3; border-top: none !important; padding-top: 0 !important; white-space: nowrap; flex: none; }
 </style>
 </helmet>
 
@@ -46,8 +53,11 @@
 
   <main style="max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px;">
 
-    <!-- breadcrumb + title -->
-    <a href="Tournaments.dc.html" style="font-size: 13px; color: rgba(30,43,69,.6); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" style-hover="color: #7A2431;">&larr; All tournaments</a>
+    <!-- back button -->
+    <a href="Tournaments.dc.html" style="display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; color: #7A2431; text-decoration: none; background: #FFFCF4; border: 1px solid rgba(122,36,49,.3); border-radius: 999px; padding: 8px 18px 8px 12px; box-shadow: 0 2px 8px rgba(30,43,69,.06); transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;" style-hover="background: #7A2431; border-color: #7A2431; color: #F8F3E7; transform: translateX(-2px); box-shadow: 0 6px 16px rgba(122,36,49,.25);">
+      <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(122,36,49,.1); font-size: 13px; line-height: 1;">&larr;</span>
+      <span style="letter-spacing: .02em;">All tournaments</span>
+    </a>
 
     <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 12px;">
       <div>
@@ -141,9 +151,49 @@
             <div style="font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 700;">Register for {{ t.name }}</div>
             <div style="font-size: 13px; color: rgba(30,43,69,.7); margin-top: 3px;">Signed in as {{ authName }} &middot; secure your seat at the board.</div>
           </div>
-          <button type="button" onClick="{{ toggleRegister }}" style="font-size: 13.5px; font-weight: 600; color: {{ regCol }}; background: {{ regBg }}; border: 1px solid {{ regBd }}; padding: 11px 24px; border-radius: 8px; white-space: nowrap; cursor: pointer;" style-hover="opacity: .9;">{{ regLabel }}</button>
+          <button type="button" onClick="{{ openRegister }}" style="font-size: 13.5px; font-weight: 600; color: {{ regCol }}; background: {{ regBg }}; border: 1px solid {{ regBd }}; padding: 11px 24px; border-radius: 8px; white-space: nowrap; cursor: pointer;" style-hover="opacity: .9;">{{ regLabel }}</button>
         </sc-if>
       </div>
+
+      <!-- register modal: 6-digit code + QR -->
+      <sc-if value="{{ regModal }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top: 14px; width: 100%; max-width: 420px; background: #FFFCF4; border: 1px solid rgba(30,43,69,.16); border-radius: 14px; box-shadow: 0 6px 22px rgba(20,26,40,.10); overflow: hidden;">
+            <div style="background: #1E2B45; color: #F5EFE3; padding: 18px 22px; display: flex; align-items: center; gap: 12px;">
+              <img src="assets/crest.png" alt="" style="width: 34px; height: 34px; object-fit: contain;">
+              <div style="display: flex; flex-direction: column; line-height: 1.2;">
+                <span style="font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700;">Registration pass</span>
+                <span style="font-size: 11px; color: rgba(245,239,227,.7);">{{ t.name }}</span>
+              </div>
+            </div>
+            <div style="padding: 24px 24px 22px; text-align: center;">
+              <div style="font-size: 12.5px; color: rgba(30,43,69,.65); line-height: 1.5;">Show this at the check-in desk, or enter the code to confirm your seat.</div>
+
+              <!-- QR code -->
+              <div style="margin: 16px auto 0; width: 148px; height: 148px; border: 1px solid rgba(30,43,69,.15); border-radius: 12px; padding: 9px; background: #FFFFFF;">
+                <div style="display: grid; grid-template-columns: repeat(11, 1fr); grid-template-rows: repeat(11, 1fr); width: 100%; height: 100%;">
+                  <sc-for list="{{ qrCells }}" as="q" hint-placeholder-count="121">
+                    <div style="background: {{ q.c }};"></div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <!-- 6-digit code -->
+              <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: rgba(30,43,69,.5); margin-top: 20px;">Your 6-digit code</div>
+              <div style="display: flex; justify-content: center; gap: 8px; margin-top: 8px;">
+                <sc-for list="{{ codeDigits }}" as="d" hint-placeholder-count="6">
+                  <span style="width: 38px; height: 48px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #7A2431; background: rgba(122,36,49,.06); border: 1px solid rgba(122,36,49,.22); border-radius: 8px;">{{ d.n }}</span>
+                </sc-for>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 16px; font-size: 12px; color: #3F6B36; font-weight: 600;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #3F6B36;"></span>Seat reserved for {{ authName }}
+              </div>
+
+              <button type="button" onClick="{{ cancelRegister }}" style="width: 100%; height: 44px; margin-top: 20px; background: transparent; color: #7A2431; border: 1px solid rgba(122,36,49,.4); border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer;" style-hover="background: #7A2431; color: #F8F3E7; border-color: #7A2431;">Cancel registration</button>
+              <button type="button" onClick="{{ closeRegister }}" style="width: 100%; height: 38px; margin-top: 8px; background: transparent; color: rgba(30,43,69,.6); border: none; border-radius: 8px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer;" style-hover="color: #1E2B45;">Hide pass</button>
+            </div>
+        </div>
+      </sc-if>
     </sc-if>
 
     <!-- =================== STANDINGS / BRACKET TAB =================== -->
@@ -325,9 +375,19 @@
 
     <!-- =================== GAMES TAB =================== -->
     <sc-if value="{{ tabGames }}" hint-placeholder-val="{{ false }}">
-      <div style="margin-top: 22px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+      <div style="margin-top: 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
         <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; margin: 0;">Broadcast boards</h2>
-        <span style="font-size: 12.5px; color: rgba(30,43,69,.6);">Click any board to open it in the review room</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span class="ju-t-meta" style="font-size: 12.5px; color: rgba(30,43,69,.6);">Click any board to open it</span>
+          <div style="display: inline-flex; background: rgba(30,43,69,.06); border: 1px solid rgba(30,43,69,.12); border-radius: 999px; padding: 3px;">
+            <button type="button" onClick="{{ setGGrid }}" aria-label="Grid view" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border: none; border-radius: 999px; background: {{ gGridBg }}; color: {{ gGridCol }}; box-shadow: {{ gGridSh }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.4"></rect><rect x="9" y="1" width="6" height="6" rx="1.4"></rect><rect x="1" y="9" width="6" height="6" rx="1.4"></rect><rect x="9" y="9" width="6" height="6" rx="1.4"></rect></svg>Grid
+            </button>
+            <button type="button" onClick="{{ setGList }}" aria-label="List view" style="display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border: none; border-radius: 999px; background: {{ gListBg }}; color: {{ gListCol }}; box-shadow: {{ gListSh }}; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 4h9M5 8h9M5 12h9"></path><circle cx="2" cy="4" r="1" fill="currentColor" stroke="none"></circle><circle cx="2" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="2" cy="12" r="1" fill="currentColor" stroke="none"></circle></svg>List
+            </button>
+          </div>
+        </div>
       </div>
 
       <sc-if value="{{ hasNoGames }}" hint-placeholder-val="{{ false }}">
@@ -347,10 +407,10 @@
             </sc-if>
             <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: rgba(30,43,69,.5);">{{ grp.count }} boards</span>
           </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 218px)); gap: 14px;">
+          <div class="ju-gwrap {{ gViewClass }}">
             <sc-for list="{{ grp.cards }}" as="g" hint-placeholder-count="4">
-              <a href="{{ g.href }}" style="text-decoration: none; color: #1E2B45; background: #FFFCF4; border: 1px solid {{ g.bd }}; border-radius: 10px; padding: 11px; display: flex; flex-direction: column; gap: 8px; transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;" style-hover="box-shadow: 0 6px 18px rgba(30,43,69,.14); transform: translateY(-2px); border-color: #A98A3F;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+              <a href="{{ g.href }}" class="ju-gcard" style="text-decoration: none; color: #1E2B45; background: #FFFCF4; border: 1px solid {{ g.bd }}; border-radius: 10px; padding: 11px; display: flex; flex-direction: column; gap: 8px; transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;" style-hover="box-shadow: 0 6px 18px rgba(30,43,69,.14); transform: translateY(-2px); border-color: #A98A3F;" style-focus="outline: 2px solid #A98A3F; outline-offset: 2px;">
+                <div class="ju-gtop" style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
                   <span style="font-size: 11.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#9675; {{ g.white }}</span>
                   <sc-if value="{{ g.live }}" hint-placeholder-val="{{ false }}">
                     <span style="display: inline-flex; align-items: center; gap: 4px; flex: none;"><span class="ju-pulse" style="width: 5px; height: 5px; border-radius: 50%; background: #7A2431;"></span><span style="font-size: 9.5px; letter-spacing: .1em; font-weight: 600; color: #7A2431;">LIVE</span></span>
@@ -359,16 +419,16 @@
                     <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: rgba(30,43,69,.65); flex: none;">{{ g.resTag }}</span>
                   </sc-if>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(8, 1fr); aspect-ratio: 1; border: 2px solid #1E2B45; border-radius: 3px; overflow: hidden;">
+                <div class="ju-gboard" style="display: grid; grid-template-columns: repeat(8, 1fr); aspect-ratio: 1; border: 2px solid #1E2B45; border-radius: 3px; overflow: hidden;">
                   <sc-for list="{{ g.cells }}" as="c" hint-placeholder-count="64">
                     <div style="background: {{ c.bg }}; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1; color: {{ c.col }};">{{ c.g }}</div>
                   </sc-for>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                <div class="ju-gbot" style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
                   <span style="font-size: 11.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">&#9679; {{ g.black }}</span>
                   <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: rgba(30,43,69,.55); flex: none;">Board {{ g.board }}</span>
                 </div>
-                <span style="display: block; text-align: center; font-size: 12px; font-weight: 600; color: #7A2431; border-top: 1px solid rgba(30,43,69,.1); padding-top: 8px;">{{ g.action }}</span>
+                <span class="ju-gact" style="display: block; text-align: center; font-size: 12px; font-weight: 600; color: #7A2431; border-top: 1px solid rgba(30,43,69,.1); padding-top: 8px;">{{ g.action }}</span>
               </a>
             </sc-for>
           </div>
@@ -425,7 +485,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { tab: 'home', stage: 1, deView: 'winners', arenaLeft: 47 * 60, registered: false };
+  state = { tab: 'home', stage: 1, deView: 'winners', arenaLeft: 47 * 60, registered: false, gView: 'grid' };
 
   getT() {
     if (!window.JU) return null;
@@ -689,8 +749,41 @@ class Component extends DCLogic {
       tabTable: this.state.tab === 'table',
       tabGames: this.state.tab === 'games',
       leaderLine: leaderLine,
-      toggleRegister: function () { self.setState({ registered: !self.state.registered }); },
-      regLabel: this.state.registered ? 'Registered \u2713' : 'Register now',
+      openRegister: function () { self.setState({ registered: true, regModal: true }); },
+      closeRegister: function () { self.setState({ regModal: false }); },
+      stop: function (e) { e.stopPropagation(); },
+      cancelRegister: function () { self.setState({ registered: false, regModal: false }); },
+      regModal: !!this.state.regModal && this.state.registered,
+      codeDigits: (function () {
+        var code = self._regCode || (self._regCode = String(Math.floor(100000 + Math.random() * 900000)));
+        return code.split('').map(function (n) { return { n: n }; });
+      })(),
+      qrCells: (function () {
+        var code = self._regCode || (self._regCode = String(Math.floor(100000 + Math.random() * 900000)));
+        var seed = 7; for (var i = 0; i < code.length; i++) seed += code.charCodeAt(i) * (i + 3);
+        function inFinder(x, y) {
+          /* three 3x3 finder squares in the corners (top-left, top-right, bottom-left) */
+          var fx = [[0, 2], [8, 10], [0, 2]], fy = [[0, 2], [0, 2], [8, 10]];
+          for (var k = 0; k < 3; k++) {
+            if (x >= fx[k][0] && x <= fx[k][1] && y >= fy[k][0] && y <= fy[k][1]) {
+              var lx = x - fx[k][0], ly = y - fy[k][0];
+              var edge = (lx === 0 || lx === 2 || ly === 0 || ly === 2);
+              var center = (lx === 1 && ly === 1);
+              return { hit: true, on: edge || center };
+            }
+          }
+          return { hit: false };
+        }
+        var cells = [];
+        for (var y = 0; y < 11; y++) for (var x = 0; x < 11; x++) {
+          var f = inFinder(x, y), on;
+          if (f.hit) on = f.on;
+          else { seed = (seed * 1103515245 + 12345) & 0x7fffffff; on = (seed % 100) < 46; }
+          cells.push({ c: on ? '#1E2B45' : 'transparent' });
+        }
+        return cells;
+      })(),
+      regLabel: this.state.registered ? 'View pass \u2713' : 'Register now',
       regBg: this.state.registered ? 'rgba(63,107,54,.12)' : '#7A2431',
       regCol: this.state.registered ? '#3F6B36' : '#F8F3E7',
       regBd: this.state.registered ? 'rgba(63,107,54,.5)' : '#7A2431',
@@ -711,6 +804,15 @@ class Component extends DCLogic {
       arenaRows: arenaRows,
       arenaClock: arenaClock, arenaLeaderLine: arenaLeaderLine,
       gameGroups: gameGroups, hasNoGames: gameGroups.length === 0,
+      gViewClass: this.state.gView === 'list' ? 'list' : '',
+      setGGrid: function () { self.setState({ gView: 'grid' }); },
+      setGList: function () { self.setState({ gView: 'list' }); },
+      gGridBg: this.state.gView === 'grid' ? '#7A2431' : 'transparent',
+      gGridCol: this.state.gView === 'grid' ? '#F8F3E7' : 'rgba(30,43,69,.6)',
+      gGridSh: this.state.gView === 'grid' ? '0 1px 4px rgba(122,36,49,.3)' : 'none',
+      gListBg: this.state.gView === 'list' ? '#7A2431' : 'transparent',
+      gListCol: this.state.gView === 'list' ? '#F8F3E7' : 'rgba(30,43,69,.6)',
+      gListSh: this.state.gView === 'list' ? '0 1px 4px rgba(122,36,49,.3)' : 'none',
       deBtns: deBtns, resultsBracket: resultsBracket,
       resultBlocks: (isDoubleElim || t.format === 'Single elimination') ? (t.results || []) : (t.results || []),
       schedRows: schedRows,
